@@ -1,0 +1,2 @@
+# RSS-Bank
+ RSS Bank Este repositório contém o código-fonte do RSS Bank, uma aplicação bancária desenvolvida em Java utilizando Spring Boot. A aplicação oferece funcionalidades como gerenciamento de contas bancárias, transações (saques, depósitos, transferências) e controle de usuários com autenticação e autorização.  Tecnologias utilizadas: Java Spring Boot JPA/Hibernate JUnit Mockito Spring Security
