@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Serviço de banco de dados
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: rss_bank
+      MYSQL_USER: sa
+      MYSQL_PASSWORD: rss@bank
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # Serviço do back-end RSS Bank
+  rss_bank_back:
+    build:
+      context: ./RSS-Bank-Back
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/rss_bank
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=rss@bank
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - db
+      - rabbitmq
+
+  # Serviço do front-end RSS Bank
+  rss_bank_front:
+    build:
+      context: ./RSS-Bank-Front
+    ports:
+      - "3000:80"  # Mapeia a porta 3000 para a porta 80 do Nginx
+    depends_on:
+      - rss_bank_back
+
+  # Serviço do RabbitMQ para mensageria
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672" # Porta de comunicação RabbitMQ
+      - "15672:15672" # Porta da interface de gerenciamento RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  # Serviço do Auditoria (Microsserviço de Auditoria)
+  rss_bank_auditoria:
+    build:
+      context: ./RSS-Bank-Auditoria
+    ports:
+      - "8081:8081" # Porta para o serviço de auditoria
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    depends_on:
+      - rabbitmq
+
+volumes:
+  db_data:

@@ -1,0 +1,52 @@
+# Ignorar arquivos e diretórios gerados pelo sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar diretório node_modules para o front-end React
+RSS Bank Front/node_modules/
+RSS Bank Front/build/
+RSS Bank Front/dist/
+
+# Ignorar arquivos de log do npm
+RSS Bank Front/npm-debug.log*
+RSS Bank Front/yarn-debug.log*
+RSS Bank Front/yarn-error.log*
+
+# Ignorar cache do ESLint
+RSS Bank Front/.eslintcache
+
+# Ignorar caches do editor/IDE
+.vscode/
+.idea/
+*.iml
+
+# Ignorar arquivos gerados pelo sistema operacional
+*.log
+
+# Ignorar build e dependências no back-end Java
+RSS Bank Back/target/
+RSS Bank Back/out/
+RSS Bank Back/.classpath
+RSS Bank Back/.project
+RSS Bank Back/.settings/
+
+# Ignorar arquivos gerados pelo Maven ou Gradle
+RSS Bank Back/.mvn/
+RSS Bank Back/mvnw*
+RSS Bank Back/gradle/
+RSS Bank Back/build/
+RSS Bank Back/*.jar
+RSS Bank Back/*.war
+RSS Bank Back/*.ear
+
+# Ignorar arquivos de configuração de IDE
+*.iml
+*.ipr
+*.iws
+
+# Ignorar logs e arquivos temporários
+RSS Bank Back/*.log
+RSS Bank Back/tmp/
+
+# Ignorar arquivo .env (caso esteja usando variáveis de ambiente no front ou back-end)
+.env
