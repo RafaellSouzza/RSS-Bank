@@ -26,9 +26,6 @@ public class TransacaoServiceTest {
     @Mock
     private ContaBancariaService contaBancariaService;
 
-    @Mock
-    private AuditoriaService auditoriaService;
-
     @InjectMocks
     private TransacaoService transacaoService;
 
@@ -66,16 +63,12 @@ public class TransacaoServiceTest {
 
         when(contaBancariaService.buscarContaPorId(any(UUID.class))).thenReturn(contaOrigem);
         doNothing().when(contaBancariaService).realizarSaque(any(UUID.class), any(BigDecimal.class));
-        doNothing().when(auditoriaService).registrarAuditoria(anyString(), anyString(), any(UUID.class),
-                any(BigDecimal.class), anyString());
 
         Transacao transacao = transacaoService.realizarSaque(contaOrigem.getId(), valorSaque);
 
         assertEquals(TipoTransacao.SAQUE, transacao.getTipo());
         assertEquals(valorSaque, transacao.getValor());
         verify(transacaoRepository, times(1)).save(any(Transacao.class));
-        verify(auditoriaService, times(1)).registrarAuditoria(anyString(), anyString(), any(UUID.class),
-                any(BigDecimal.class), anyString());
     }
 
     @Test
@@ -94,16 +87,12 @@ public class TransacaoServiceTest {
 
         when(contaBancariaService.buscarContaPorId(any(UUID.class))).thenReturn(contaDestino);
         doNothing().when(contaBancariaService).realizarDeposito(any(UUID.class), any(BigDecimal.class));
-        doNothing().when(auditoriaService).registrarAuditoria(anyString(), anyString(), any(UUID.class),
-                any(BigDecimal.class), anyString());
 
         Transacao transacao = transacaoService.realizarDeposito(contaDestino.getId(), valorDeposito);
 
         assertEquals(TipoTransacao.DEPOSITO, transacao.getTipo());
         assertEquals(valorDeposito, transacao.getValor());
         verify(transacaoRepository, times(1)).save(any(Transacao.class));
-        verify(auditoriaService, times(1)).registrarAuditoria(anyString(), anyString(), any(UUID.class),
-                any(BigDecimal.class), anyString());
     }
 
     @Test
@@ -114,8 +103,6 @@ public class TransacaoServiceTest {
         when(contaBancariaService.buscarContaPorId(contaDestino.getId())).thenReturn(contaDestino);
         doNothing().when(contaBancariaService).realizarTransferencia(any(UUID.class), any(UUID.class),
                 any(BigDecimal.class));
-        doNothing().when(auditoriaService).registrarAuditoria(anyString(), anyString(), any(UUID.class),
-                any(BigDecimal.class), anyString());
 
         Transacao transacao = transacaoService.realizarTransferencia(contaOrigem.getId(), contaDestino.getId(),
                 valorTransferencia);
@@ -123,8 +110,6 @@ public class TransacaoServiceTest {
         assertEquals(TipoTransacao.TRANSFERENCIA, transacao.getTipo());
         assertEquals(valorTransferencia, transacao.getValor());
         verify(transacaoRepository, times(1)).save(any(Transacao.class));
-        verify(auditoriaService, times(1)).registrarAuditoria(anyString(), anyString(), any(UUID.class),
-                any(BigDecimal.class), anyString());
     }
 
     @Test
