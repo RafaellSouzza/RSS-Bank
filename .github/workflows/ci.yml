@@ -10,36 +10,52 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-    - name: Build with Maven
-      run: mvn clean install -DskipTests
+      - name: Build RSS-Bank-Back
+        working-directory: ./RSS-Bank-Back
+        run: mvn clean install -DskipTests
 
-    - name: Run Tests
-      run: mvn test
+      - name: Run Tests for RSS-Bank-Back
+        working-directory: ./RSS-Bank-Back
+        run: mvn test
 
-    - name: Upload JAR as artifact
-      if: success() && steps.build.outputs.success == 'true'
-      uses: actions/upload-artifact@v3
-      with:
-        name: rss-bank-back-jar
-        path: target/*.jar
+      - name: Build RSS-Bank-Auditoria
+        working-directory: ./RSS-Bank-Auditoria
+        run: mvn clean install -DskipTests
+
+      - name: Run Tests for RSS-Bank-Auditoria
+        working-directory: ./RSS-Bank-Auditoria
+        run: mvn test
+
+      - name: Upload JAR for RSS-Bank-Back as artifact
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: rss-bank-back-jar
+          path: ./RSS-Bank-Back/target/*.jar
+
+      - name: Upload JAR for RSS-Bank-Auditoria as artifact
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: rss-bank-auditoria-jar
+          path: ./RSS-Bank-Auditoria/target/*.jar
