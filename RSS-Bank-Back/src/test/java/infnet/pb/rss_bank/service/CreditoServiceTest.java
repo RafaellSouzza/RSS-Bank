@@ -32,12 +32,11 @@ public class CreditoServiceTest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Criar um objeto Credito para o teste
         credito = new Credito();
         credito.setDescricao("Crédito de Teste");
         credito.setValor(new BigDecimal("1000.00"));
-        credito.setJuros(new BigDecimal("0.10"));  // 10% de juros
-        credito.setParcelas(10); // 10 parcelas
+        credito.setJuros(new BigDecimal("0.10"));
+        credito.setParcelas(10);
         credito.setDataInicio(LocalDate.now());
     }
 

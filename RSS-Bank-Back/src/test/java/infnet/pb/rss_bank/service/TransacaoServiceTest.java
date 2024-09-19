@@ -1,5 +1,6 @@
 package infnet.pb.rss_bank.service;
 
+import infnet.pb.rss_bank.model.Cliente;
 import infnet.pb.rss_bank.model.ContaBancaria;
 import infnet.pb.rss_bank.model.TipoTransacao;
 import infnet.pb.rss_bank.model.Transacao;
@@ -30,20 +31,28 @@ public class TransacaoServiceTest {
 
     private ContaBancaria contaOrigem;
     private ContaBancaria contaDestino;
+    private Cliente clienteOrigem;
+    private Cliente clienteDestino;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
 
+        clienteOrigem = new Cliente();
+        clienteOrigem.setNome("Cliente Origem");
+
+        clienteDestino = new Cliente();
+        clienteDestino.setNome("Cliente Destino");
+
         contaOrigem = new ContaBancaria();
         contaOrigem.setId(UUID.randomUUID());
         contaOrigem.setSaldo(BigDecimal.valueOf(1000));
-        contaOrigem.setCliente(new Cliente()); // Adiciona um cliente válido à conta origem
+        contaOrigem.setCliente(clienteOrigem);
 
         contaDestino = new ContaBancaria();
         contaDestino.setId(UUID.randomUUID());
         contaDestino.setSaldo(BigDecimal.valueOf(500));
-        contaDestino.setCliente(new Cliente()); // Adiciona um cliente válido à conta destino
+        contaDestino.setCliente(clienteDestino);
 
         when(transacaoRepository.save(any(Transacao.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
