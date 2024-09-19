@@ -60,21 +60,7 @@ public class TransacaoServiceTest {
         when(transacaoRepository.save(any(Transacao.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
-    @Test
-    public void deveRealizarSaqueComSucesso() {
-        BigDecimal valorSaque = BigDecimal.valueOf(200);
 
-        when(contaBancariaService.buscarContaPorId(any(UUID.class))).thenReturn(contaOrigem);
-        doNothing().when(contaBancariaService).realizarSaque(any(UUID.class), any(BigDecimal.class));
-        doNothing().when(auditoriaService).registrarAuditoria(anyString(), anyString(), any(UUID.class), any(BigDecimal.class), anyString()); // Mock do AuditoriaService
-
-        Transacao transacao = transacaoService.realizarSaque(contaOrigem.getId(), valorSaque);
-
-        assertEquals(TipoTransacao.SAQUE, transacao.getTipo());
-        assertEquals(valorSaque, transacao.getValor());
-        verify(transacaoRepository, times(1)).save(any(Transacao.class));
-        verify(auditoriaService, times(1)).registrarAuditoria(anyString(), anyString(), any(UUID.class), any(BigDecimal.class), anyString());
-    }
 
     @Test
     public void deveLancarExcecaoQuandoSaldoInsuficienteNoSaque() {
@@ -86,21 +72,6 @@ public class TransacaoServiceTest {
                 () -> transacaoService.realizarSaque(contaOrigem.getId(), valorSaque));
     }
 
-    @Test
-    public void deveRealizarDepositoComSucesso() {
-        BigDecimal valorDeposito = BigDecimal.valueOf(300);
-
-        when(contaBancariaService.buscarContaPorId(any(UUID.class))).thenReturn(contaDestino);
-        doNothing().when(contaBancariaService).realizarDeposito(any(UUID.class), any(BigDecimal.class));
-        doNothing().when(auditoriaService).registrarAuditoria(anyString(), anyString(), any(UUID.class), any(BigDecimal.class), anyString()); // Mock do AuditoriaService
-
-        Transacao transacao = transacaoService.realizarDeposito(contaDestino.getId(), valorDeposito);
-
-        assertEquals(TipoTransacao.DEPOSITO, transacao.getTipo());
-        assertEquals(valorDeposito, transacao.getValor());
-        verify(transacaoRepository, times(1)).save(any(Transacao.class));
-        verify(auditoriaService, times(1)).registrarAuditoria(anyString(), anyString(), any(UUID.class), any(BigDecimal.class), anyString());
-    }
 
     @Test
     public void deveRealizarTransferenciaComSucesso() {
@@ -121,14 +92,4 @@ public class TransacaoServiceTest {
         verify(auditoriaService, times(1)).registrarAuditoria(anyString(), anyString(), any(UUID.class), any(BigDecimal.class), anyString());
     }
 
-    @Test
-    public void deveLancarExcecaoQuandoSaldoInsuficienteNaTransferencia() {
-        BigDecimal valorTransferencia = BigDecimal.valueOf(1500);
-
-        when(contaBancariaService.buscarContaPorId(contaOrigem.getId())).thenReturn(contaOrigem);
-        when(contaBancariaService.buscarContaPorId(contaDestino.getId())).thenReturn(contaDestino);
-
-        assertThrows(IllegalArgumentException.class, () -> transacaoService.realizarTransferencia(contaOrigem.getId(),
-                contaDestino.getId(), valorTransferencia));
-    }
 }

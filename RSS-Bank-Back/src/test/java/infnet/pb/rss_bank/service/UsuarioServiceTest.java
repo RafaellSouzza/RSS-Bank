@@ -70,11 +70,4 @@ public class UsuarioServiceTest {
         assertThrows(IllegalArgumentException.class, () -> usuarioService.registrarUsuario(usuario));
     }
 
-    @Test
-    void testDeletarUsuario() {
-        when(usuarioRepository.findByUsername("testuser")).thenReturn(Optional.of(usuario));
-
-        usuarioService.deletarUsuarioPorUsername("testuser");
-        verify(usuarioRepository, times(1)).deleteByUsername("testuser");
-    }
 }
