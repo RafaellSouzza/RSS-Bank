@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class TransacaoServiceTest {
-
 
     @Mock
     private TransacaoRepository transacaoRepository;
@@ -40,10 +38,12 @@ public class TransacaoServiceTest {
         contaOrigem = new ContaBancaria();
         contaOrigem.setId(UUID.randomUUID());
         contaOrigem.setSaldo(BigDecimal.valueOf(1000));
+        contaOrigem.setCliente(new Cliente()); // Adiciona um cliente válido à conta origem
 
         contaDestino = new ContaBancaria();
         contaDestino.setId(UUID.randomUUID());
         contaDestino.setSaldo(BigDecimal.valueOf(500));
+        contaDestino.setCliente(new Cliente()); // Adiciona um cliente válido à conta destino
 
         when(transacaoRepository.save(any(Transacao.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
@@ -64,11 +64,12 @@ public class TransacaoServiceTest {
 
     @Test
     public void deveLancarExcecaoQuandoSaldoInsuficienteNoSaque() {
-        BigDecimal valorSaque = BigDecimal.valueOf(1200); // Saldo da conta é 1000
+        BigDecimal valorSaque = BigDecimal.valueOf(1200);
 
         when(contaBancariaService.buscarContaPorId(any(UUID.class))).thenReturn(contaOrigem);
 
-        assertThrows(IllegalArgumentException.class, () -> transacaoService.realizarSaque(contaOrigem.getId(), valorSaque));
+        assertThrows(IllegalArgumentException.class,
+                () -> transacaoService.realizarSaque(contaOrigem.getId(), valorSaque));
     }
 
     @Test
@@ -91,9 +92,11 @@ public class TransacaoServiceTest {
 
         when(contaBancariaService.buscarContaPorId(contaOrigem.getId())).thenReturn(contaOrigem);
         when(contaBancariaService.buscarContaPorId(contaDestino.getId())).thenReturn(contaDestino);
-        doNothing().when(contaBancariaService).realizarTransferencia(any(UUID.class), any(UUID.class), any(BigDecimal.class));
+        doNothing().when(contaBancariaService).realizarTransferencia(any(UUID.class), any(UUID.class),
+                any(BigDecimal.class));
 
-        Transacao transacao = transacaoService.realizarTransferencia(contaOrigem.getId(), contaDestino.getId(), valorTransferencia);
+        Transacao transacao = transacaoService.realizarTransferencia(contaOrigem.getId(), contaDestino.getId(),
+                valorTransferencia);
 
         assertEquals(TipoTransacao.TRANSFERENCIA, transacao.getTipo());
         assertEquals(valorTransferencia, transacao.getValor());
@@ -107,6 +110,7 @@ public class TransacaoServiceTest {
         when(contaBancariaService.buscarContaPorId(contaOrigem.getId())).thenReturn(contaOrigem);
         when(contaBancariaService.buscarContaPorId(contaDestino.getId())).thenReturn(contaDestino);
 
-        assertThrows(IllegalArgumentException.class, () -> transacaoService.realizarTransferencia(contaOrigem.getId(), contaDestino.getId(), valorTransferencia));
+        assertThrows(IllegalArgumentException.class, () -> transacaoService.realizarTransferencia(contaOrigem.getId(),
+                contaDestino.getId(), valorTransferencia));
     }
 }
