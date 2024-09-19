@@ -1,6 +1,5 @@
 package infnet.pb.rss_bank.service;
 
-import infnet.pb.rss_bank.exception.UsuarioException;
 import infnet.pb.rss_bank.model.Usuario;
 import infnet.pb.rss_bank.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +14,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UsuarioServiceTest {
+public class UsuarioServiceTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
@@ -31,13 +30,9 @@ class UsuarioServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
         usuario = new Usuario();
         usuario.setUsername("testuser");
         usuario.setSenha("Test@1234");
-
-        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
     }
 
     @Test
@@ -45,8 +40,8 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByUsername("testuser")).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("Test@1234", usuario.getSenha())).thenReturn(true);
 
-        Usuario autenticado = usuarioService.autenticarUsuario("testuser", "Test@1234");
-        assertNotNull(autenticado);
+        boolean resultado = usuarioService.autenticarUsuario("testuser", "Test@1234");
+        assertTrue(resultado);
     }
 
     @Test
@@ -59,12 +54,12 @@ class UsuarioServiceTest {
 
     @Test
     void testRegistrarUsuarioComSucesso() {
-        when(usuarioRepository.existsByUsername("testuser")).thenReturn(false);
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+        when(passwordEncoder.encode("Test@1234")).thenReturn("encodedPassword");
+        when(usuarioRepository.save(usuario)).thenReturn(usuario);
 
         Usuario novoUsuario = usuarioService.registrarUsuario(usuario);
         assertNotNull(novoUsuario);
-        verify(usuarioRepository, times(1)).save(usuario);
+        assertEquals("encodedPassword", novoUsuario.getSenha());
     }
 
     @Test
@@ -86,6 +81,6 @@ class UsuarioServiceTest {
         when(usuarioRepository.findByUsername("testuser")).thenReturn(Optional.of(usuario));
 
         usuarioService.deletarUsuarioPorUsername("testuser");
-        verify(usuarioRepository, times(1)).delete(usuario);
+        verify(usuarioRepository, times(1)).deleteByUsername("testuser");
     }
 }
