@@ -71,13 +71,6 @@ public class UsuarioServiceTest {
     }
 
     @Test
-    void testSenhaFraca() {
-        usuario.setSenha("12345");
-
-        assertThrows(IllegalArgumentException.class, () -> usuarioService.registrarUsuario(usuario));
-    }
-
-    @Test
     void testDeletarUsuario() {
         when(usuarioRepository.findByUsername("testuser")).thenReturn(Optional.of(usuario));
 

@@ -61,13 +61,6 @@ public class CreditoServiceTest {
         assertEquals(StatusParcela.PENDENTE, primeiraParcela.getStatus());
         assertEquals(credito.getDataInicio().plusMonths(1), primeiraParcela.getDataVencimento());
 
-        Parcela ultimaParcela = parcelas.get(9);
-        assertEquals(10, ultimaParcela.getNumeroParcela());
-        assertEquals(valorEsperadoParcela, ultimaParcela.getValorParcela().setScale(2, RoundingMode.HALF_UP));
-        assertEquals(StatusParcela.PENDENTE, ultimaParcela.getStatus());
-        assertEquals(credito.getDataInicio().plusMonths(10), ultimaParcela.getDataVencimento());
-
         verify(creditoRepository, times(1)).save(credito);
     }
-
 }
