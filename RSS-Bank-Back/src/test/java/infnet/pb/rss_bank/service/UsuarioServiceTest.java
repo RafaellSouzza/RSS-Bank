@@ -1,5 +1,6 @@
 package infnet.pb.rss_bank.service;
 
+import infnet.pb.rss_bank.exception.UsuarioException;
 import infnet.pb.rss_bank.model.Usuario;
 import infnet.pb.rss_bank.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
