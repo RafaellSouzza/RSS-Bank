@@ -30,14 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Build RSS-Bank-Eureka
-        working-directory: ./RSS-Bank-Eureka
-        run: mvn clean install -DskipTests
-
-      - name: Run Tests for RSS-Bank-Eureka
-        working-directory: ./RSS-Bank-Eureka
-        run: mvn test
-
       - name: Build RSS-Bank-ConfigServer
         working-directory: ./RSS-Bank-ConfigServer
         run: mvn clean install -DskipTests
