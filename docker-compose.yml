@@ -2,57 +2,118 @@ version: '3.8'
 
 services:
 
-  # Serviço do back-end RSS Bank
+  eureka-server:
+    build:
+      context: ./RSS-Bank-Eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - rssbank-network
+
+  config-server:
+    build:
+      context: ./RSS-Bank-ConfigServer
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_APPLICATION_NAME: config-server
+    depends_on:
+      - eureka-server
+    networks:
+      - rssbank-network
+
+  gateway:
+    build:
+      context: ./RSS-Bank-Gateway
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_APPLICATION_NAME: rss-bank-gateway
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+    depends_on:
+      - eureka-server
+      - config-server
+    networks:
+      - rssbank-network
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - rssbank-network
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - rssbank-network
+
   rss_bank_back:
     build:
       context: ./RSS-Bank-Back
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PORT=5672
-      - SPRING_RABBITMQ_USERNAME=guest
-      - SPRING_RABBITMQ_PASSWORD=guest
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_APPLICATION_NAME: rss-bank-back
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_ZIPKIN_BASE_URL: http://zipkin:9411/
     depends_on:
       - rabbitmq
+      - eureka-server
+      - config-server
+      - zipkin
+    networks:
+      - rssbank-network
 
-  # Serviço do front-end RSS Bank
-  rss_bank_front:
-    build:
-      context: ./RSS-Bank-Front
-    ports:
-      - "3000:80"  # Mapeia a porta 3000 para a porta 80 do Nginx
-    depends_on:
-      - rss_bank_back
-
-  # Serviço do RabbitMQ para mensageria
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    ports:
-      - "5672:5672" # Porta de comunicação RabbitMQ
-      - "15672:15672" # Porta da interface de gerenciamento RabbitMQ
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-
-  # Serviço do Auditoria (Microsserviço de Auditoria)
   rss_bank_auditoria:
     build:
       context: ./RSS-Bank-Auditoria
     ports:
-      - "8081:8081" # Porta para o serviço de auditoria
+      - "8081:8081"
     environment:
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PORT=5672
-      - SPRING_RABBITMQ_USERNAME=guest
-      - SPRING_RABBITMQ_PASSWORD=guest
-      - SPRING_DATASOURCE_URL=jdbc:h2:mem:rss_auditoria;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:rss_auditoria;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_APPLICATION_NAME: rss-bank-auditoria
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      SPRING_ZIPKIN_BASE_URL: http://zipkin:9411/
     depends_on:
       - rabbitmq
+      - eureka-server
+      - config-server
+      - zipkin
+    networks:
+      - rssbank-network
+
+  rss_bank_front:
+    build:
+      context: ./RSS-Bank-Front
+    ports:
+      - "3000:80"
+    depends_on:
+      - rss_bank_back
+    networks:
+      - rssbank-network
+
+networks:
+  rssbank-network:
+    driver: bridge
