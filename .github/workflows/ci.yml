@@ -76,7 +76,6 @@ jobs:
         with:
           name: jars
           path: |
-            ./RSS-Bank-Eureka/target/*.jar
             ./RSS-Bank-ConfigServer/target/*.jar
             ./RSS-Bank-Gateway/target/*.jar
             ./RSS-Bank-Back/target/*.jar
