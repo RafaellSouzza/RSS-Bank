@@ -30,22 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Build RSS-Bank-ConfigServer
-        working-directory: ./RSS-Bank-ConfigServer
-        run: mvn clean install -DskipTests
-
-      - name: Run Tests for RSS-Bank-ConfigServer
-        working-directory: ./RSS-Bank-ConfigServer
-        run: mvn test
-
-      - name: Build RSS-Bank-Gateway
-        working-directory: ./RSS-Bank-Gateway
-        run: mvn clean install -DskipTests
-
-      - name: Run Tests for RSS-Bank-Gateway
-        working-directory: ./RSS-Bank-Gateway
-        run: mvn test
-
       - name: Build RSS-Bank-Back
         working-directory: ./RSS-Bank-Back
         run: mvn clean install -DskipTests
@@ -68,7 +52,5 @@ jobs:
         with:
           name: jars
           path: |
-            ./RSS-Bank-ConfigServer/target/*.jar
-            ./RSS-Bank-Gateway/target/*.jar
             ./RSS-Bank-Back/target/*.jar
             ./RSS-Bank-Auditoria/target/*.jar
